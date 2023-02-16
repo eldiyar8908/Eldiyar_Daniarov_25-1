@@ -12,14 +12,23 @@
         .post_block {
             margin: 20px;
         }
+        .post_image {
+            width: 100%;
+        }
     </style>
     <div class="posts">
         {% for post in posts %}
             <div class="post_block">
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
+                        <img class="post_image" src="/media/{{ post.image }}" alt="">
                         <h5 class="card-title">{{ post.title }}</h5>
                         <h6 class="card-title">Rate: {{ post.rate }}</h6>
+
+                        {% for hashtag in post.hashtags %}
+                            <p>{{ hashtag.title }}</p>
+                        {% endfor %}
+
                         <a href="#" class="card-link">More</a>
                     </div>
                 </div>

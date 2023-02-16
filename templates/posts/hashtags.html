@@ -1,0 +1,11 @@
+{% extends 'layouts/index.html' %}
+
+{% block content %}
+    <div class="hashtags">
+        {% for hashtag in hashtags %}
+            <div class="hashtag_block">
+                <h3>{{ hashtag.title }}</h3>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, HttpResponse, render
-from posts.models import Post
+from posts.models import Post, Hashtag
 # Create your views here.
 
 def youtube_view(request):
@@ -22,6 +22,25 @@ def posts_view(request):
         posts = Post.objects.all()
 
         context = {
-            'posts': posts
+            'posts': [
+                {
+                    'id': post.id,
+                    'title': post.title,
+                    'image': post.image,
+                    'rate': post.rate,
+                    'hashtags': post.hashtags.all()
+                } for post in posts
+            ]
         }
         return render(request, 'posts/posts.html', context=context)
+
+
+def hashtags_view(request):
+    if request.method == 'GET':
+        hashtags = Hashtag.objects.all()
+
+        context = {
+            'hashtags': hashtags
+        }
+
+        return render(request, 'posts/hashtags.html', context=context)
