@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from posts.views import youtube_view, hello_view, main_page_view, posts_view, hashtags_view
+from posts.views import youtube_view, hello_view, main_page_view, posts_view, hashtags_view, post_detail_view
 from django.conf.urls.static import static
 from blog.settings import MEDIA_ROOT, MEDIA_URL
 
@@ -26,6 +26,7 @@ urlpatterns = [
     path('hello/', hello_view),
     path('', main_page_view),
     path('posts/', posts_view),
+    path('posts/<int:id>/', post_detail_view),
     path('hashtags/', hashtags_view)
 ]
 

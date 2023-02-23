@@ -18,3 +18,9 @@ class Post(models.Model):
     hashtags = models.ManyToManyField(Hashtag)
 
 
+class Comment(models.Model):
+    text = models.CharField(max_length=255)
+    created_date = models.DateField(auto_now_add=True, null=True)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+
+
