@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block head %}
-    <link rel="stylesheet" href="{% static "posts.css "%}>
+    <link rel="stylesheet" href="{% static 'posts.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -12,9 +12,10 @@
                 <div class="card" style="width: 18rem;">
                     <div class="card-body">
                         {% if post.image %}
+
                             <img class="post_image" src="/media/{{ post.image }}" alt="">
                         {% else %}
-                            <img class="post_image" src="{% static 'img.png' %}" alt="">
+                            <img class="post_image" src="{% static 'dj_logo.png' %}" alt="">
                         {% endif %}
                         <h5 class="card-title">{{ post.title }}</h5>
                         <h6 class="card-title">Rate: {{ post.rate }}</h6>

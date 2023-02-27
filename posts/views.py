@@ -1,5 +1,8 @@
 from django.shortcuts import redirect, HttpResponse, render
-from posts.models import Post, Hashtag
+from posts.models import Post, Hashtag, Comment
+from posts.forms import PostCreateForm, CommentCreateForm
+
+
 # Create your views here.
 
 def youtube_view(request):
@@ -51,8 +54,51 @@ def post_detail_view(request, id):
         post = Post.objects.get(id=id)
 
         context = {
-            'post' : post,
-            'comments': post.comment_set.all()
+            'post': post,
+            'comments': post.comment_set.all(),
+            'form': CommentCreateForm
         }
 
         return render(request, 'posts/detail.html', context=context)
+
+    if request.method == 'POST':
+        post = Post.objects.get(id=id)
+        data = request.POST
+        form = CommentCreateForm(data=data)
+
+        if form.is_valid():
+            Comment.objects.create(
+                text=form.cleaned_data.get('text'),
+            )
+
+        context = {
+            'post': post,
+            'comments': post.comments.all,
+            'form': form
+        }
+
+
+def create_post_view(request):
+    if request.method == 'GET':
+        context = {
+            'form': PostCreateForm
+        }
+        return render(request, 'posts/create.html', context=context)
+
+    if request.method == 'POST':
+        data, files = request.POST, request.FILES
+
+        form = PostCreateForm(data, files)
+
+        if form.is_valid():
+            Post.objects.create(
+                image=form.cleaned_data.get('image'),
+                title=form.cleaned_data.get('title'),
+                description=form.cleaned_data.get('description'),
+                rate=form.cleaned_data.get('rate')
+            )
+            return redirect('/posts')
+
+        return render(request, 'posts/create.html', context={
+            'form': form
+        })

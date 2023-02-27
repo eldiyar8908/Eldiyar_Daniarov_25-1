@@ -1,5 +1,5 @@
 {% extends 'layouts/index.html' %}
-{% extends 'layouts/index.html' %}
+{% load static %}
 
 {% block content %}
     <style type="text/css">
@@ -7,20 +7,24 @@
             width: 80%;
             margin-left: 10%;
         }
+
         .post > img {
             width: 100%;
         }
+
         .dates {
             display: flex;
             justify-content: space-between;
             margin-top: 40px;
         }
+
         .comment_block {
             padding: 10px;
             background: #242b2e;
             color: #fff;
             margin-bottom: 20px;
         }
+
         .comments_title {
             font-size: 26px;
             font-weight: bold;
@@ -28,7 +32,11 @@
         }
     </style>
     <div class="post">
-        <img src="/media/{{ post.image }}/" alt="">
+        {% if post.image %}
+            <img src="/media/{{ post.image }}" alt="">
+        {% else %}
+            <img src="{% static 'img.png' %}" alt="">
+        {% endif %}
         <h1>{{ post.title }}</h1>
         <h5>{{ post.description }}</h5>
         <div class="dates">
@@ -36,6 +44,11 @@
             <h6>{{ post.modified_date }}</h6>
         </div>
         <p class="comments_title">Comments</p>
+        <form action="/posts/{{ post.id }}/" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Add Comment">
+        </form>
         <div class="comments">
             {% for comment in comments %}
                 <div class="comment_block">
