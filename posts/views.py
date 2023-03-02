@@ -33,7 +33,8 @@ def posts_view(request):
                     'rate': post.rate,
                     'hashtags': post.hashtags.all()
                 } for post in posts
-            ]
+            ],
+            'user': request.user
         }
         return render(request, 'posts/posts.html', context=context)
 
@@ -102,3 +103,6 @@ def create_post_view(request):
         return render(request, 'posts/create.html', context={
             'form': form
         })
+
+
+
