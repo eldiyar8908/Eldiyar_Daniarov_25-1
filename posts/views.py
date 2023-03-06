@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, HttpResponse, render
 from posts.models import Post, Hashtag, Comment
 from posts.forms import PostCreateForm, CommentCreateForm
+from posts.constants import PAGINATION_LIMIT
 
 
 # Create your views here.
@@ -23,6 +24,22 @@ def main_page_view(request):
 def posts_view(request):
     if request.method == 'GET':
         posts = Post.objects.all()
+        search = request.GET.get('search')
+        page = int(request.GET.get("page", 1))
+
+        if search:
+            posts = posts.filter(title__contains=search) | posts.filter(description__contains=search)
+
+        max_page = posts.__len__() / PAGINATION_LIMIT
+        if round(max_page) < max_page:
+            max_page = round(max_page) + 1
+        else:
+            max_page = round(max_page)
+
+        posts = posts[PAGINATION_LIMIT * (page-1): PAGINATION_LIMIT*page]
+
+
+
 
         context = {
             'posts': [
@@ -34,7 +51,8 @@ def posts_view(request):
                     'hashtags': post.hashtags.all()
                 } for post in posts
             ],
-            'user': request.user
+            'user': request.user,
+            'pages': range(1, max_page+1)
         }
         return render(request, 'posts/posts.html', context=context)
 

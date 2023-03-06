@@ -11,3 +11,24 @@
 .post_image {
     width: 100%;
 }
+
+.pages {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.page_button {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    border: 1px solid black;
+    background: #242b2e;
+    color: #ffffff;
+    transition: all 0.3s;
+    margin: 5px;
+}
+
+.page_button:hover {
+    transform: scale(1.1);
+}

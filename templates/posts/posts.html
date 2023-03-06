@@ -6,6 +6,10 @@
 {% endblock %}
 
 {% block content %}
+    <form antion="/posts/" method="get">
+        <input type="text" name="search">
+        <input type="submit" value="Search">
+    </form>
     <div class="posts">
         {% for post in posts %}
             <div class="post_block">
@@ -28,6 +32,13 @@
                     </div>
                 </div>
             </div>
+        {% endfor %}
+    </div>
+    <div class="pages">
+        {% for page in pages %}
+            <a href="/posts/?page={{ page }}">
+                <button class="page_button">{{ page }}</button>
+            </a>
         {% endfor %}
     </div>
 {% endblock %}
