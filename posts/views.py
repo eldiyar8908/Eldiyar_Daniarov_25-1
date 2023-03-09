@@ -94,36 +94,7 @@ def post_detail_view(request, id):
 
 
 
-# class PostDetailCBV(DetailView):
-#     model = Post
-#     template_name = 'posts/detail.html'
-#
-#     def get(self, request, **kwargs):
-#         post = Post.objects.get(id=id)
-#
-#         context = {
-#             'post': post,
-#             'comments': post.comment_set.all(),
-#             'form': CommentCreateForm
-#         }
-#
-#         return render(request, 'posts/detail.html', context=context)
-#
-#     def post(self, request, *args, **kwargs):
-#         post = Post.objects.get(id=id)
-#         data = request.POST
-#         form = CommentCreateForm(data=data)
-#
-#         if form.is_valid():
-#             Comment.objects.create(
-#                 text=form.cleaned_data.get('text'),
-#             )
-#
-#         context = {
-#             'post': post,
-#             'comments': post.comments.all,
-#             'form': form
-#         }
+
 
 
 class PostDetailCBV(DetailView, CreateView):
