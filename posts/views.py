@@ -1,29 +1,25 @@
-from django.shortcuts import redirect, HttpResponse, render
+from django.shortcuts import redirect, render
 from posts.models import Post, Hashtag, Comment
 from posts.forms import PostCreateForm, CommentCreateForm
 from posts.constants import PAGINATION_LIMIT
+from django.views.generic import ListView, CreateView, DetailView
 
 
-# Create your views here.
-
-def youtube_view(request):
-    if request.method == 'GET':
-        return redirect('https://www.youtube.com')
 
 
-def hello_view(request):
-    if request.method == "GET":
-        return HttpResponse('Hello! Its my project')
+
+class MainPageCBV(ListView):
+    model = Post
+    template_name = "layouts/index.html"
 
 
-def main_page_view(request):
-    if request.method == 'GET':
-        return render(request, 'layouts/index.html')
+class PostsCBV(ListView):
+    model = Post
+    template_name = 'posts/posts.html'
+    context_object_name = 'posts'
 
-
-def posts_view(request):
-    if request.method == 'GET':
-        posts = Post.objects.all()
+    def get(self, request, **kwargs):
+        posts = self.get_queryset()
         search = request.GET.get('search')
         page = int(request.GET.get("page", 1))
 
@@ -36,10 +32,7 @@ def posts_view(request):
         else:
             max_page = round(max_page)
 
-        posts = posts[PAGINATION_LIMIT * (page-1): PAGINATION_LIMIT*page]
-
-
-
+        posts = posts[PAGINATION_LIMIT * (page - 1): PAGINATION_LIMIT * page]
 
         context = {
             'posts': [
@@ -52,20 +45,23 @@ def posts_view(request):
                 } for post in posts
             ],
             'user': request.user,
-            'pages': range(1, max_page+1)
+            'pages': range(1, max_page + 1)
         }
-        return render(request, 'posts/posts.html', context=context)
+        return render(request, self.template_name, context=context)
 
 
-def hashtags_view(request):
-    if request.method == 'GET':
-        hashtags = Hashtag.objects.all()
+class HashtagsCBV(ListView):
+    model = Hashtag
+    template_name = 'posts/hashtags.html'
+
+    def get(self, request, **kwargs):
+        hashtags = self.get_queryset()
 
         context = {
             'hashtags': hashtags
         }
 
-        return render(request, 'posts/hashtags.html', context=context)
+        return render(request, self.template_name, context=context)
 
 
 def post_detail_view(request, id):
@@ -97,14 +93,83 @@ def post_detail_view(request, id):
         }
 
 
-def create_post_view(request):
-    if request.method == 'GET':
-        context = {
-            'form': PostCreateForm
-        }
-        return render(request, 'posts/create.html', context=context)
 
-    if request.method == 'POST':
+# class PostDetailCBV(DetailView):
+#     model = Post
+#     template_name = 'posts/detail.html'
+#
+#     def get(self, request, **kwargs):
+#         post = Post.objects.get(id=id)
+#
+#         context = {
+#             'post': post,
+#             'comments': post.comment_set.all(),
+#             'form': CommentCreateForm
+#         }
+#
+#         return render(request, 'posts/detail.html', context=context)
+#
+#     def post(self, request, *args, **kwargs):
+#         post = Post.objects.get(id=id)
+#         data = request.POST
+#         form = CommentCreateForm(data=data)
+#
+#         if form.is_valid():
+#             Comment.objects.create(
+#                 text=form.cleaned_data.get('text'),
+#             )
+#
+#         context = {
+#             'post': post,
+#             'comments': post.comments.all,
+#             'form': form
+#         }
+
+
+class PostDetailCBV(DetailView, CreateView):
+    model = Post
+    template_name = 'posts/detail.html'
+    form_class = CommentCreateForm
+    pk_url_kwarg = 'id'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return {
+            'post': self.get_object(),
+            'comments': Comment.objects.filter(post=self.get_object()),
+            'form': kwargs.get('form', self.form_class)
+        }
+
+    def post(self, request, **kwargs):
+        data = request.POST
+        form = CommentCreateForm(data=data)
+
+        if form.is_valid():
+            Post.objects.create(
+                text=form.cleaned_data.get('text'),
+                rate=form.cleaned_data.get('rate'),
+                post_id=self.get_object().id
+            )
+            return redirect(f'/posts/{self.get_object().id}/')
+
+        return render(request, self.template_name, context=self.get_context_data(
+            form=form
+        ))
+
+
+class CreatePostCBV(ListView, CreateView):
+    model = Post
+    template_name = 'posts/create.html'
+    form_class = PostCreateForm
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        return {
+            'form': self.form_class if not kwargs.get('form') else kwargs['form']
+        }
+
+    def get (self, request, **kwargs):
+        return render(request, self.template_name, context=self.get_context_data())
+
+    def post(self, request, *args, **kwargs):
         data, files = request.POST, request.FILES
 
         form = PostCreateForm(data, files)
@@ -121,6 +186,7 @@ def create_post_view(request):
         return render(request, 'posts/create.html', context={
             'form': form
         })
+
 
 
 

@@ -1,19 +1,30 @@
 from django.shortcuts import render, redirect
 
+
 # Create your views here.
 from users.forms import RegisterForm, LoginForm
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.views.generic import ListView, CreateView, DetailView
+from posts.models import Post
+from posts.forms import PostCreateForm
 
-def register_view(request):
-    if request.method == "GET":
+
+
+
+
+class RegisterCBV(ListView, CreateView):
+    model = Post
+    template_name = 'users/register.html'
+
+    def get(self, request, **kwargs):
         context = {
             'form': RegisterForm
         }
 
         return render(request, 'users/register.html', context=context)
 
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         data = request.POST
         form = RegisterForm(data=data)
 
@@ -31,15 +42,17 @@ def register_view(request):
         })
 
 
-def login_view(request):
-    if request.method == "GET":
+class LoginCBV(ListView):
+    template_name = 'users/login.html'
+
+    def get(self, request, **kwargs):
         context = {
             'form': LoginForm
         }
 
         return render(request, 'users/login.html', context=context)
 
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         data = request.POST
         form = LoginForm(data=data)
 
@@ -51,7 +64,7 @@ def login_view(request):
             )
 
             if user:
-                login(request,user)
+                login(request, user)
                 return redirect('/posts')
             else:
                 form.add_error('username', 'пользователь не найден')
@@ -61,6 +74,9 @@ def login_view(request):
         })
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('/posts/')
+class LogoutCBV(ListView):
+    def get(self, request):
+        logout(request)
+        return redirect('/posts/')
+
+

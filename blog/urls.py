@@ -15,24 +15,24 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from posts.views import youtube_view, hello_view, main_page_view, posts_view, hashtags_view, post_detail_view, create_post_view
-from users.views import register_view, login_view, logout_view
+from posts.views import MainPageCBV, PostsCBV, HashtagsCBV, CreatePostCBV, PostDetailCBV, post_detail_view
+from users.views import RegisterCBV, LoginCBV, LogoutCBV
 from django.conf.urls.static import static
 from blog.settings import MEDIA_ROOT, MEDIA_URL
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('youtube/', youtube_view),
-    path('hello/', hello_view),
-    path('', main_page_view),
-    path('posts/', posts_view),
-    path('posts/<int:id>/', post_detail_view),
-    path('hashtags/', hashtags_view),
-    path('posts/create/', create_post_view),
-    path('users/register/', register_view),
-    path('users/login/', login_view),
-    path('users/logout/', logout_view)
+    path('posts/', PostsCBV.as_view()),
+    path('posts/', PostsCBV.as_view()),
+    path('', MainPageCBV.as_view()),
+    path('hashtags/', HashtagsCBV.as_view()),
+    path('posts/create/', CreatePostCBV.as_view()),
+    path('posts/<int:id>/', PostDetailCBV.as_view()),
+    # path('posts/<int:pk>/', PostDetailCBV.as_view()),
+    path('users/register/', RegisterCBV.as_view()),
+    path('users/login/', LoginCBV.as_view()),
+    path('users/logout/', LogoutCBV.as_view())
 ]
 
 urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
